@@ -1,0 +1,162 @@
+@import "tailwindcss";
+
+@layer theme {
+  :root {
+    --vt-sky: #0EA5E9;
+    --vt-green: #10B981;
+    --vt-gold: #F59E0B;
+    --vt-red: #EF4444;
+    --vt-dark: #1E293B;
+    --app-font: "Manrope", "Inter", "Segoe UI", "Noto Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --app-font-size: clamp(14px, 0.2vw + 13px, 16px);
+    --app-touch-target: 40px;
+    --ui-radius-card: 1.5rem;
+    --ui-radius-panel: 2rem;
+    --ui-radius-btn: 1rem;
+    --ui-shadow-card: 0 1px 2px rgba(15, 23, 42, 0.06), 0 10px 24px rgba(15, 23, 42, 0.04);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: var(--app-font-size);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #F8FAFC;
+  font-family: var(--app-font);
+  line-height: 1.45;
+  text-rendering: optimizeLegibility;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+select,
+input[type="button"],
+input[type="submit"] {
+  min-height: var(--app-touch-target);
+}
+
+table {
+  width: 100%;
+}
+
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.lucide {
+  width: clamp(14px, 1.1vw + 10px, 20px);
+  height: clamp(14px, 1.1vw + 10px, 20px);
+  stroke-width: 2;
+}
+
+.ui-card {
+  border-radius: var(--ui-radius-card);
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  box-shadow: var(--ui-shadow-card);
+}
+
+.ui-panel {
+  border-radius: var(--ui-radius-panel);
+}
+
+.ui-kicker {
+  font-size: clamp(0.68rem, 0.25vw + 0.62rem, 0.8rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ui-title {
+  font-size: clamp(1rem, 0.9vw + 0.86rem, 1.75rem);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+
+.ui-btn {
+  min-height: var(--app-touch-target);
+  border-radius: var(--ui-radius-btn);
+  font-weight: 800;
+  transition: all 180ms ease;
+}
+
+.ui-btn:active {
+  transform: scale(0.98);
+}
+
+.ui-btn-primary {
+  background: #0ea5e9;
+  color: #ffffff;
+}
+
+.ui-btn-primary:hover {
+  background: #0284c7;
+}
+
+.ui-btn-secondary {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.ui-btn-secondary:hover {
+  background: #e2e8f0;
+}
+
+[class*="text-[8px]"] {
+  font-size: clamp(0.68rem, 0.24vw + 0.6rem, 0.78rem) !important;
+}
+
+[class*="text-[9px]"] {
+  font-size: clamp(0.72rem, 0.3vw + 0.62rem, 0.82rem) !important;
+}
+
+[class*="text-[10px]"] {
+  font-size: clamp(0.74rem, 0.35vw + 0.64rem, 0.86rem) !important;
+}
+
+[class*="text-[11px]"] {
+  font-size: clamp(0.78rem, 0.35vw + 0.68rem, 0.9rem) !important;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --app-touch-target: 42px;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --app-font-size: 14px;
+    --app-touch-target: 44px;
+  }
+}
