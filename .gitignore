@@ -6,3 +6,5 @@ dist-ssr
 .env
 .codex-logs
 .codex-dev.pid
+
+.vercel
