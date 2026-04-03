@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
   Package,
   Truck,
@@ -49,13 +49,14 @@ import CustomerManagementPage from './pages/CustomerManagement';
 import SupplierManagementPage from './pages/SupplierManagement';
 import WarehouseShelfManagementPage from './pages/WarehouseShelfManagement';
 import ManagementMenuPage from './pages/ManagementMenu';
+import EmployeeAccountManagementPage from './pages/EmployeeAccountManagement';
 
 type UserRole = 'PLATFORM' | 'WHOLESALER' | 'RETAILER';
-type View = 'dashboard' | 'supplier-entry' | 'driver-app' | 'finance-board' | 'scanner' | 'virtual-shelf' | 'warehouse-mgmt' | 'inventory-mgmt' | 'management-menu' | 'supply-chain' | 'ecosystem' | 'auto-split' | 'retail-pos' | 'wholesale-pos' | 'artery' | 'global-wholesale' | 'customs-docs' | 'digital-archive' | 'fleet-mgmt' | 'wholesaler-home' | 'retailer-home' | 'customer-mgmt' | 'supplier-mgmt' | 'warehouse-shelf';
+type View = 'dashboard' | 'supplier-entry' | 'driver-app' | 'finance-board' | 'scanner' | 'virtual-shelf' | 'warehouse-mgmt' | 'inventory-mgmt' | 'management-menu' | 'employee-mgmt' | 'supply-chain' | 'ecosystem' | 'auto-split' | 'retail-pos' | 'wholesale-pos' | 'artery' | 'global-wholesale' | 'customs-docs' | 'digital-archive' | 'fleet-mgmt' | 'wholesaler-home' | 'retailer-home' | 'customer-mgmt' | 'supplier-mgmt' | 'warehouse-shelf';
 const SESSION_KEY_PREFIX = 'stretpos.session.';
 const VIEW_KEY_PREFIX = 'stretpos.activeView.';
 const ACTIVE_ROLE_KEY = 'stretpos.activeRole';
-const VIEW_IDS: View[] = ['dashboard', 'supplier-entry', 'driver-app', 'finance-board', 'scanner', 'virtual-shelf', 'warehouse-mgmt', 'inventory-mgmt', 'management-menu', 'supply-chain', 'ecosystem', 'auto-split', 'retail-pos', 'wholesale-pos', 'artery', 'global-wholesale', 'customs-docs', 'digital-archive', 'fleet-mgmt', 'wholesaler-home', 'retailer-home', 'customer-mgmt', 'supplier-mgmt', 'warehouse-shelf'];
+const VIEW_IDS: View[] = ['dashboard', 'supplier-entry', 'driver-app', 'finance-board', 'scanner', 'virtual-shelf', 'warehouse-mgmt', 'inventory-mgmt', 'management-menu', 'employee-mgmt', 'supply-chain', 'ecosystem', 'auto-split', 'retail-pos', 'wholesale-pos', 'artery', 'global-wholesale', 'customs-docs', 'digital-archive', 'fleet-mgmt', 'wholesaler-home', 'retailer-home', 'customer-mgmt', 'supplier-mgmt', 'warehouse-shelf'];
 
 const getSessionKey = (userRole: UserRole) => `${SESSION_KEY_PREFIX}${userRole}`;
 const getViewKey = (userRole: UserRole) => `${VIEW_KEY_PREFIX}${userRole}`;
@@ -69,7 +70,8 @@ const VIEW_TITLE_MAP: Partial<Record<View, string>> = {
   'virtual-shelf': '虚拟货架',
   'supplier-mgmt': '供应商管理',
   'inventory-mgmt': '库存管理',
-  'management-menu': '管理菜单',
+  'management-menu': '后台设置',
+  'employee-mgmt': '员工账号管理',
 };
 const getSavedView = (userRole: UserRole): View => {
   try {
@@ -107,6 +109,7 @@ const App: React.FC = () => {
   const [activeView, setActiveView] = useState<View>(() => getSavedView(initialRole));
   const [retailPosSearch, setRetailPosSearch] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     try {
@@ -134,12 +137,22 @@ const App: React.FC = () => {
     } catch {}
   };
 
-  const handleLogout = () => {
+  const handleSwitchAccount = () => {
     setIsLoggedIn(false);
     setCurrentUser(null);
+    setIsProfileMenuOpen(false);
     try {
       localStorage.removeItem(getSessionKey(role));
       localStorage.removeItem(ACTIVE_ROLE_KEY);
+    } catch {}
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+    setIsProfileMenuOpen(false);
+    try {
+      localStorage.removeItem(getSessionKey(role));
     } catch {}
   };
 
@@ -192,8 +205,13 @@ const App: React.FC = () => {
     } catch {}
   }, [activeView, role, isLoggedIn]);
 
+  useEffect(() => {
+    setIsProfileMenuOpen(false);
+  }, [activeView, isLoggedIn]);
+
   const allNavItems = [
     { id: 'dashboard', label: '主仪表盘', icon: LayoutDashboard, roles: ['PLATFORM', 'WHOLESALER', 'RETAILER'] },
+    { id: 'retail-pos', label: '零售收银系统', icon: ShoppingCart, roles: ['PLATFORM', 'RETAILER', 'WHOLESALER'] },
     { id: 'supplier-entry', label: t('supplierEntry'), icon: Package, roles: ['PLATFORM', 'WHOLESALER'] },
     { id: 'supply-chain', label: '供应链流转控制', icon: ClipboardList, roles: ['PLATFORM', 'WHOLESALER', 'RETAILER'] },
     { id: 'global-wholesale', label: t('globalLogistics'), icon: Plane, roles: ['PLATFORM', 'WHOLESALER'] },
@@ -202,9 +220,8 @@ const App: React.FC = () => {
     { id: 'fleet-mgmt', label: t('fleetMgmt'), icon: Users, roles: ['PLATFORM', 'WHOLESALER'] },
     { id: 'warehouse-mgmt', label: t('warehouseMgmt'), icon: Box, roles: ['PLATFORM'] },
     { id: 'inventory-mgmt', label: '库存管理', icon: Box, roles: ['PLATFORM', 'WHOLESALER', 'RETAILER'] },
-    { id: 'management-menu', label: '管理菜单', icon: Settings, roles: ['PLATFORM', 'WHOLESALER', 'RETAILER'] },
+    { id: 'management-menu', label: '后台设置', icon: Settings, roles: ['PLATFORM', 'WHOLESALER', 'RETAILER'] },
     { id: 'scanner', label: '库存扫码器', icon: Scan, roles: ['PLATFORM', 'RETAILER'] },
-    { id: 'retail-pos', label: '零售收银系统', icon: ShoppingCart, roles: ['PLATFORM', 'RETAILER', 'WHOLESALER'] },
     { id: 'wholesale-pos', label: t('wholesalePOS'), icon: Layers, roles: ['PLATFORM', 'WHOLESALER'] },
     { id: 'warehouse-shelf', label: '货架管理', icon: Layers, roles: ['PLATFORM', 'WHOLESALER'] },
     { id: 'virtual-shelf', label: '虚拟货架', icon: Layers, roles: ['PLATFORM', 'RETAILER'] },
@@ -220,13 +237,13 @@ const App: React.FC = () => {
   const navItems = allNavItems.filter(item => item.roles.includes(role));
 
   const languages = [
-    { code: 'en', name: 'English', flag: '🇬🇧' },
-    { code: 'zh_CN', name: '简体中文', flag: '🇨🇳' },
-    { code: 'bi', name: 'Bislama', flag: '🇻🇺' },
-    { code: 'fr', name: 'Français', flag: '🇫🇷' },
-    { code: 'ja', name: '日本語', flag: '🇯🇵' },
-    { code: 'ko', name: '한국어', flag: '🇰🇷' },
-    { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
+    { code: 'en', name: 'English', flag: 'EN' },
+    { code: 'zh_CN', name: '简体中文', flag: 'ZH' },
+    { code: 'bi', name: 'Bislama', flag: 'BI' },
+    { code: 'fr', name: 'Francais', flag: 'FR' },
+    { code: 'ja', name: 'Japanese', flag: 'JA' },
+    { code: 'ko', name: 'Korean', flag: 'KO' },
+    { code: 'vi', name: 'Vietnamese', flag: 'VI' },
   ];
 
   return (
@@ -275,14 +292,14 @@ const App: React.FC = () => {
               className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
             >
               <LogOut size={20} />
-              {isSidebarOpen && <span>{t('logout')}</span>}
+              {isSidebarOpen && <span>退出登录</span>}
             </button>
             <button 
-              onClick={handleLogout} 
+              onClick={handleSwitchAccount} 
               className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-rose-400 hover:bg-rose-500/10 transition-all"
             >
               <X size={20} />
-              {isSidebarOpen && <span>{t('switchAccount')}</span>}
+              {isSidebarOpen && <span>鍒囨崲璐﹀彿</span>}
             </button>
           </div>
           
@@ -313,7 +330,7 @@ const App: React.FC = () => {
               {activeView === 'retail-pos' && (
                 <input
                   type="text"
-                  placeholder="搜索货品 / 扫码"
+                  placeholder="鎼滅储璐у搧 / 鎵爜"
                   value={retailPosSearch}
                   onChange={(e) => {
                     const value = e.target.value;
@@ -347,8 +364,39 @@ const App: React.FC = () => {
               <div className="hidden sm:flex min-w-[64px] px-3 py-1 bg-slate-100 rounded-lg text-[10px] font-black text-slate-400 uppercase items-center justify-center whitespace-nowrap leading-none">
                 {currentUser?.id}
               </div>
-              <div className="w-8 h-8 rounded-full bg-sky-500 border-2 border-white shadow-sm flex items-center justify-center text-white text-[10px] font-black">
-                {currentUser?.name?.slice(0, 2).toUpperCase()}
+              <div className="relative">
+                <button
+                  onClick={() => setIsProfileMenuOpen((v) => !v)}
+                  className="w-8 h-8 rounded-full bg-sky-500 border-2 border-white shadow-sm flex items-center justify-center text-white text-[10px] font-black"
+                >
+                  {currentUser?.name?.slice(0, 2).toUpperCase()}
+                </button>
+                {isProfileMenuOpen && (
+                  <div className="absolute right-0 top-11 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl p-4 z-50 space-y-3">
+                    <div>
+                      <div className="text-sm font-black text-slate-900">{currentUser?.name}</div>
+                      <div className="text-xs text-slate-500">{currentUser?.id} 路 {role}</div>
+                    </div>
+                    <div className="bg-slate-50 rounded-xl p-3 text-xs text-slate-600 space-y-1">
+                      <div>余额：{currentUser?.balance?.toLocaleString?.() ?? '--'}</div>
+                      <div>额度：{currentUser?.credit_limit?.toLocaleString?.() ?? '--'}</div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={handleSwitchAccount}
+                        className="ui-btn ui-btn-secondary px-3 py-2 rounded-lg text-xs"
+                      >
+                        鍒囨崲璐﹀彿
+                      </button>
+                      <button
+                        onClick={handleLogout}
+                        className="ui-btn px-3 py-2 rounded-lg text-xs bg-rose-500 text-white hover:bg-rose-600"
+                      >
+                        退出登录
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </header>
@@ -373,7 +421,8 @@ const App: React.FC = () => {
                 {activeView === 'virtual-shelf' && <VirtualShelfPage />}
                 {activeView === 'warehouse-mgmt' && <WarehouseManagementPage />}
                 {activeView === 'inventory-mgmt' && <WarehouseManagementPage />}
-                {activeView === 'management-menu' && <ManagementMenuPage onNavigate={(v) => setActiveView(v as View)} />}
+                {activeView === 'management-menu' && <ManagementMenuPage onNavigate={(v) => setActiveView(v as View)} accountId={currentUser?.id} />}
+                {activeView === 'employee-mgmt' && <EmployeeAccountManagementPage accountId={currentUser?.id} />}
                 {activeView === 'supply-chain' && <SupplierWorkflowPage />}
                 {activeView === 'ecosystem' && <UnifiedEcosystemPage />}
                 {activeView === 'auto-split' && <AutoSplitRulesPage />}
@@ -440,8 +489,8 @@ const App: React.FC = () => {
     
                     <div className="text-center pt-4 border-t border-slate-50">
                        <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest leading-relaxed">
-                         由 Stret 物流网络提供 · 维拉港 2026<br/>
-                         加密安全会话
+                         鐢?Stret 鐗╂祦缃戠粶鎻愪緵 路 缁存媺娓?2026<br/>
+                         鍔犲瘑瀹夊叏浼氳瘽
                        </p>
                     </div>
                  </motion.div>

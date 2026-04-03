@@ -9,6 +9,11 @@ export interface AccountProgramSettings {
   retailPosSearch?: string;
   retailPosCategory?: string;
   retailPosPayment?: 'CASH' | 'CARD' | 'STRET_PAY' | 'CHECK';
+  retailReceiptPaper?: '58MM' | '80MM';
+  taxQrEnabled?: boolean;
+  taxQrTemplate?: string;
+  taxMerchantTin?: string;
+  taxBranchCode?: string;
 }
 
 const getInventoryKey = (accountId: string) => `${INVENTORY_PREFIX}${accountId}`;
@@ -136,7 +141,7 @@ export const getAccountProgramSettings = async (accountId: string): Promise<Acco
     const scopedAccountId = toScopedAccountId(accountId, userId);
     const { data, error } = await supabase
       .from('account_program_settings')
-      .select('language,retail_pos_search,retail_pos_category,retail_pos_payment')
+      .select('language,retail_pos_search,retail_pos_category,retail_pos_payment,retail_receipt_paper,tax_qr_enabled,tax_qr_template,tax_merchant_tin,tax_branch_code')
       .eq('account_id', scopedAccountId)
       .maybeSingle();
     if (error || !data) return local;
@@ -145,6 +150,11 @@ export const getAccountProgramSettings = async (accountId: string): Promise<Acco
       retailPosSearch: data.retail_pos_search || undefined,
       retailPosCategory: data.retail_pos_category || undefined,
       retailPosPayment: data.retail_pos_payment || undefined,
+      retailReceiptPaper: data.retail_receipt_paper || undefined,
+      taxQrEnabled: typeof data.tax_qr_enabled === 'boolean' ? data.tax_qr_enabled : undefined,
+      taxQrTemplate: data.tax_qr_template || undefined,
+      taxMerchantTin: data.tax_merchant_tin || undefined,
+      taxBranchCode: data.tax_branch_code || undefined,
     };
     setLocalSettings(accountId, mapped);
     return { ...local, ...mapped };
@@ -169,6 +179,11 @@ export const patchAccountProgramSettings = async (accountId: string, patch: Acco
         retail_pos_search: patch.retailPosSearch,
         retail_pos_category: patch.retailPosCategory,
         retail_pos_payment: patch.retailPosPayment,
+        retail_receipt_paper: patch.retailReceiptPaper,
+        tax_qr_enabled: patch.taxQrEnabled,
+        tax_qr_template: patch.taxQrTemplate,
+        tax_merchant_tin: patch.taxMerchantTin,
+        tax_branch_code: patch.taxBranchCode,
       },
       { onConflict: 'account_id' }
     );

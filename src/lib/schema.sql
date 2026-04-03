@@ -104,5 +104,47 @@ CREATE TABLE IF NOT EXISTS account_program_settings (
     retail_pos_search TEXT,
     retail_pos_category TEXT,
     retail_pos_payment TEXT,
+    retail_receipt_paper TEXT DEFAULT '58MM',
+    tax_qr_enabled BOOLEAN DEFAULT FALSE,
+    tax_qr_template TEXT,
+    tax_merchant_tin TEXT,
+    tax_branch_code TEXT,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 9. POS shift log (handover / close)
+CREATE TABLE IF NOT EXISTS pos_shift_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    account_id TEXT NOT NULL,
+    cashier_name TEXT NOT NULL,
+    started_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    ended_at TIMESTAMP WITH TIME ZONE,
+    status TEXT NOT NULL DEFAULT 'OPEN',
+    sales_count INT NOT NULL DEFAULT 0,
+    sales_amount DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    handovers JSONB DEFAULT '[]'::jsonb
+);
+
+-- 10. POS day close summary
+CREATE TABLE IF NOT EXISTS pos_day_closures (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    account_id TEXT NOT NULL,
+    business_date DATE NOT NULL,
+    closed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    operator TEXT,
+    sales_count INT NOT NULL DEFAULT 0,
+    sales_amount DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    payment_breakdown JSONB DEFAULT '{}'::jsonb
+);
+
+-- 11. POS month close summary
+CREATE TABLE IF NOT EXISTS pos_month_closures (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    account_id TEXT NOT NULL,
+    business_month TEXT NOT NULL,
+    closed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    operator TEXT,
+    sales_count INT NOT NULL DEFAULT 0,
+    sales_amount DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    payment_breakdown JSONB DEFAULT '{}'::jsonb
 );
