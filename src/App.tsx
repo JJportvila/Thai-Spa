@@ -58,11 +58,12 @@ import MyInventoryPage from './pages/MyInventory';
 import CustomerHomePage from './pages/CustomerHomePage';
 
 type UserRole = 'PLATFORM' | 'WHOLESALER' | 'RETAILER';
-type View = 'customer-home' | 'dashboard' | 'supplier-entry' | 'driver-app' | 'finance-board' | 'vat-returns' | 'scanner' | 'virtual-shelf' | 'warehouse-mgmt' | 'inventory-mgmt' | 'my-inventory' | 'management-menu' | 'employee-mgmt' | 'supply-chain' | 'ecosystem' | 'auto-split' | 'retail-pos' | 'retail-tools' | 'label-print' | 'wholesale-pos' | 'artery' | 'global-wholesale' | 'customs-docs' | 'digital-archive' | 'fleet-mgmt' | 'wholesaler-home' | 'retailer-home' | 'customer-mgmt' | 'supplier-mgmt' | 'warehouse-shelf';
+type View = 'customer_home' | 'customer-home' | 'dashboard' | 'supplier-entry' | 'driver-app' | 'finance-board' | 'vat-returns' | 'scanner' | 'virtual-shelf' | 'warehouse-mgmt' | 'inventory-mgmt' | 'my-inventory' | 'management-menu' | 'employee-mgmt' | 'supply-chain' | 'ecosystem' | 'auto-split' | 'retail-pos' | 'retail-tools' | 'label-print' | 'wholesale-pos' | 'artery' | 'global-wholesale' | 'customs-docs' | 'digital-archive' | 'fleet-mgmt' | 'wholesaler-home' | 'retailer-home' | 'customer-mgmt' | 'supplier-mgmt' | 'warehouse-shelf';
 const SESSION_KEY_PREFIX = 'stretpos.session.';
 const VIEW_KEY_PREFIX = 'stretpos.activeView.';
 const ACTIVE_ROLE_KEY = 'stretpos.activeRole';
-const VIEW_IDS: View[] = ['customer-home', 'dashboard', 'supplier-entry', 'driver-app', 'finance-board', 'vat-returns', 'scanner', 'virtual-shelf', 'warehouse-mgmt', 'inventory-mgmt', 'my-inventory', 'management-menu', 'employee-mgmt', 'supply-chain', 'ecosystem', 'auto-split', 'retail-pos', 'retail-tools', 'label-print', 'wholesale-pos', 'artery', 'global-wholesale', 'customs-docs', 'digital-archive', 'fleet-mgmt', 'wholesaler-home', 'retailer-home', 'customer-mgmt', 'supplier-mgmt', 'warehouse-shelf'];
+const HOME_VIEW: View = 'customer_home';
+const VIEW_IDS: View[] = ['customer_home', 'customer-home', 'dashboard', 'supplier-entry', 'driver-app', 'finance-board', 'vat-returns', 'scanner', 'virtual-shelf', 'warehouse-mgmt', 'inventory-mgmt', 'my-inventory', 'management-menu', 'employee-mgmt', 'supply-chain', 'ecosystem', 'auto-split', 'retail-pos', 'retail-tools', 'label-print', 'wholesale-pos', 'artery', 'global-wholesale', 'customs-docs', 'digital-archive', 'fleet-mgmt', 'wholesaler-home', 'retailer-home', 'customer-mgmt', 'supplier-mgmt', 'warehouse-shelf'];
 
 const getSessionKey = (userRole: UserRole) => `${SESSION_KEY_PREFIX}${userRole}`;
 const getViewKey = (userRole: UserRole) => `${VIEW_KEY_PREFIX}${userRole}`;
@@ -70,6 +71,7 @@ const isValidView = (value: string | null): value is View => !!value && VIEW_IDS
 const isValidRole = (value: string | null): value is UserRole => value === 'PLATFORM' || value === 'WHOLESALER' || value === 'RETAILER';
 const VIEW_TITLE_MAP: Partial<Record<View, string>> = {
   dashboard: '主仪表盘',
+  customer_home: '顾客主页',
   'supply-chain': '供应链流转控制',
   scanner: '库存扫码器',
   'retail-pos': '零售收银系统',
@@ -83,21 +85,29 @@ const VIEW_TITLE_MAP: Partial<Record<View, string>> = {
   'management-menu': '后台设置',
   'employee-mgmt': '员工账号管理',
 };
+const normalizeView = (value: string | null): View | null => {
+  if (!value) return null;
+  if (value === 'customer-home') return HOME_VIEW;
+  if (value === 'customer_home') return HOME_VIEW;
+  return isValidView(value) ? value : null;
+};
 const getSavedView = (userRole: UserRole): View => {
   try {
     const saved = localStorage.getItem(getViewKey(userRole));
-    return isValidView(saved) ? saved : 'customer-home';
+    return normalizeView(saved) ?? HOME_VIEW;
   } catch {
-    return 'customer-home';
+    return HOME_VIEW;
   }
 };
 
 const getViewFromLocation = (): View | null => {
   const hash = window.location.hash.replace(/^#\/?/, '').trim();
-  if (isValidView(hash)) return hash;
+  const normalizedHash = normalizeView(hash);
+  if (normalizedHash) return normalizedHash;
   try {
     const view = new URLSearchParams(window.location.search).get('view');
-    if (isValidView(view)) return view;
+    const normalizedView = normalizeView(view);
+    if (normalizedView) return normalizedView;
   } catch {}
   return null;
 };
@@ -126,7 +136,7 @@ const App: React.FC = () => {
 
   const initialRole = getInitialRole();
   const [role, setRole] = useState<UserRole>(initialRole);
-  const [activeView, setActiveView] = useState<View>(() => getViewFromLocation() || 'customer-home');
+  const [activeView, setActiveView] = useState<View>(() => getViewFromLocation() || HOME_VIEW);
   const [retailPosSearch, setRetailPosSearch] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -153,7 +163,7 @@ const App: React.FC = () => {
     setRole(userRole);
     setIsLoggedIn(true);
     setCurrentUser(buildUser(userRole));
-    setActiveView(getSavedView(userRole) || 'customer-home');
+    setActiveView(getSavedView(userRole) === HOME_VIEW ? 'dashboard' : getSavedView(userRole));
     setShowLoginScreen(false);
     try {
       localStorage.setItem(getSessionKey(userRole), '1');
@@ -187,9 +197,9 @@ const App: React.FC = () => {
       setShowLoginScreen(true);
       return;
     }
-    if (view === 'customer-home') {
+    if (view === 'customer-home' || view === 'customer_home') {
       setShowLoginScreen(false);
-      setActiveView('customer-home');
+      setActiveView(HOME_VIEW);
       return;
     }
     setActiveView(view as View);
