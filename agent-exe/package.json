@@ -1,0 +1,39 @@
+{
+  "name": "stret-pos-agent",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Stret POS camera proxy desktop agent",
+  "scripts": {
+    "start": "node agent.js",
+    "build:win": "pkg agent.js --targets node18-win-x64 --output dist/StretPOS-Agent.exe",
+    "start:desktop": "electron electron-main.js",
+    "build:desktop": "electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "com.stretpos.agent.desktop",
+    "productName": "StretPOS Agent",
+    "directories": {
+      "output": "dist-desktop"
+    },
+    "files": [
+      "agent.js",
+      "electron-main.js",
+      "electron-preload.js",
+      "app-web/**/*",
+      "package.json"
+    ],
+    "extraMetadata": {
+      "main": "electron-main.js"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    }
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3",
+    "pkg": "^5.8.1"
+  }
+}

@@ -3,8 +3,15 @@ node_modules
 dist
 dist-ssr
 *.local
+.tmp-*
+*.log
+dump.html
 .env
 .codex-logs
 .codex-dev.pid
 
 .vercel
+agent-exe/node_modules
+agent-exe/dist
+agent-exe/dist-*/
+agent-exe/release

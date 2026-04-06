@@ -1,19 +1,20 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
 @import "tailwindcss";
 
 @layer theme {
   :root {
-    --vt-sky: #0EA5E9;
-    --vt-green: #10B981;
-    --vt-gold: #F59E0B;
-    --vt-red: #EF4444;
-    --vt-dark: #1E293B;
-    --app-font: "Manrope", "Inter", "Segoe UI", "Noto Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
-    --app-font-size: clamp(14px, 0.2vw + 13px, 16px);
-    --app-touch-target: 40px;
-    --ui-radius-card: 1.5rem;
-    --ui-radius-panel: 2rem;
-    --ui-radius-btn: 1rem;
-    --ui-shadow-card: 0 1px 2px rgba(15, 23, 42, 0.06), 0 10px 24px rgba(15, 23, 42, 0.04);
+    --vt-sky: #1a237e;
+    --vt-green: #24308f;
+    --vt-gold: #5060bf;
+    --vt-red: #6a78d2;
+    --vt-dark: #1e293b;
+    --app-font: "Inter", "Manrope", "Segoe UI", "Noto Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --app-font-size: clamp(14px, 0.14vw + 14px, 15px);
+    --app-touch-target: 42px;
+    --ui-radius-card: 1rem;
+    --ui-radius-panel: 1rem;
+    --ui-radius-btn: 0.875rem;
+    --ui-shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 28px rgba(15, 23, 42, 0.05);
   }
 }
 
@@ -31,10 +32,11 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #F8FAFC;
+  background-color: #f8f9fa;
   font-family: var(--app-font);
   line-height: 1.45;
   text-rendering: optimizeLegibility;
+  color: #0f172a;
 }
 
 #root {
@@ -47,6 +49,10 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+button {
+  font-weight: 700;
 }
 
 button,
@@ -79,9 +85,18 @@ table {
   stroke-width: 2;
 }
 
+.inventory-template {
+  font-family: "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.inventory-template .lucide {
+  width: unset;
+  height: unset;
+}
+
 .ui-card {
   border-radius: var(--ui-radius-card);
-  border: 1px solid #e2e8f0;
+  border: 1px solid #dbe3ef;
   background: #ffffff;
   box-shadow: var(--ui-shadow-card);
 }
@@ -106,8 +121,10 @@ table {
 .ui-btn {
   min-height: var(--app-touch-target);
   border-radius: var(--ui-radius-btn);
-  font-weight: 800;
+  font-weight: 700;
+  font-size: 0.92rem;
   transition: all 180ms ease;
+  letter-spacing: 0.01em;
 }
 
 .ui-btn:active {
@@ -115,21 +132,222 @@ table {
 }
 
 .ui-btn-primary {
-  background: #0ea5e9;
+  background: #1a237e;
   color: #ffffff;
 }
 
 .ui-btn-primary:hover {
-  background: #0284c7;
+  background: #151d66;
 }
 
 .ui-btn-secondary {
-  background: #f1f5f9;
+  background: #ffffff;
   color: #334155;
+  border: 1px solid #dbe3ef;
 }
 
 .ui-btn-secondary:hover {
-  background: #e2e8f0;
+  background: #f8fbff;
+}
+
+/* Blue-white monochrome override for legacy status colors */
+[class*="bg-rose-"],
+[class*="bg-red-"],
+[class*="bg-orange-"],
+[class*="bg-amber-"],
+[class*="bg-yellow-"],
+[class*="bg-green-"],
+[class*="bg-emerald-"],
+[class*="bg-lime-"],
+[class*="bg-sky-"],
+[class*="bg-indigo-"],
+[class*="bg-purple-"],
+[class*="bg-cyan-"],
+[class*="bg-pink-"] {
+  background-color: #eef4ff !important;
+}
+
+[class*="bg-rose-50"],
+[class*="bg-rose-100"],
+[class*="bg-rose-200"],
+[class*="bg-red-50"],
+[class*="bg-red-100"],
+[class*="bg-red-200"],
+[class*="bg-orange-50"],
+[class*="bg-orange-100"],
+[class*="bg-orange-200"],
+[class*="bg-amber-50"],
+[class*="bg-amber-100"],
+[class*="bg-amber-200"],
+[class*="bg-yellow-50"],
+[class*="bg-yellow-100"],
+[class*="bg-yellow-200"],
+[class*="bg-green-50"],
+[class*="bg-green-100"],
+[class*="bg-green-200"],
+[class*="bg-emerald-50"],
+[class*="bg-emerald-100"],
+[class*="bg-emerald-200"],
+[class*="bg-lime-50"],
+[class*="bg-lime-100"],
+[class*="bg-lime-200"],
+[class*="bg-sky-50"],
+[class*="bg-sky-100"],
+[class*="bg-sky-200"],
+[class*="bg-indigo-50"],
+[class*="bg-indigo-100"],
+[class*="bg-indigo-200"],
+[class*="bg-purple-50"],
+[class*="bg-purple-100"],
+[class*="bg-purple-200"],
+[class*="bg-cyan-50"],
+[class*="bg-cyan-100"],
+[class*="bg-cyan-200"],
+[class*="bg-pink-50"],
+[class*="bg-pink-100"],
+[class*="bg-pink-200"] {
+  background-color: #f8f9fa !important;
+}
+
+[class*="bg-slate-900"],
+[class*="bg-slate-800"],
+[class*="bg-slate-700"],
+[class*="bg-slate-600"],
+[class*="bg-slate-500"],
+[class*="bg-gray-900"],
+[class*="bg-gray-800"],
+[class*="bg-gray-700"],
+[class*="bg-neutral-900"],
+[class*="bg-neutral-800"],
+[class*="bg-zinc-900"],
+[class*="bg-stone-900"] {
+  background-color: #1a237e !important;
+}
+
+[class*="bg-slate-100"],
+[class*="bg-slate-200"],
+[class*="bg-gray-100"],
+[class*="bg-gray-200"],
+[class*="bg-neutral-100"],
+[class*="bg-neutral-200"],
+[class*="bg-zinc-100"],
+[class*="bg-zinc-200"],
+[class*="bg-stone-100"],
+[class*="bg-stone-200"] {
+  background-color: #f8f9fa !important;
+}
+
+/* Deep-blue action surfaces should always use light foreground text/icons */
+[class*="bg-[#1a237e]"],
+[class*="bg-[#19217b]"],
+[class*="bg-[#24308f]"],
+[class*="bg-blue-"],
+[class*="bg-indigo-"],
+[class*="bg-sky-"] {
+  color: #ffffff !important;
+}
+
+[class*="bg-[#1a237e]"] svg,
+[class*="bg-[#19217b]"] svg,
+[class*="bg-[#24308f]"] svg,
+[class*="bg-blue-"] svg,
+[class*="bg-indigo-"] svg,
+[class*="bg-sky-"] svg {
+  color: currentColor !important;
+}
+
+[class*="text-rose-"],
+[class*="text-red-"],
+[class*="text-orange-"],
+[class*="text-amber-"],
+[class*="text-yellow-"],
+[class*="text-green-"],
+[class*="text-emerald-"],
+[class*="text-lime-"],
+[class*="text-sky-"],
+[class*="text-indigo-"],
+[class*="text-purple-"],
+[class*="text-cyan-"],
+[class*="text-pink-"] {
+  color: #24308f !important;
+}
+
+[class*="border-rose-"],
+[class*="border-red-"],
+[class*="border-orange-"],
+[class*="border-amber-"],
+[class*="border-yellow-"],
+[class*="border-green-"],
+[class*="border-emerald-"],
+[class*="border-lime-"],
+[class*="border-sky-"],
+[class*="border-indigo-"],
+[class*="border-purple-"],
+[class*="border-cyan-"],
+[class*="border-pink-"] {
+  border-color: #d7e2ff !important;
+}
+
+[class*="shadow-rose-"],
+[class*="shadow-red-"],
+[class*="shadow-orange-"],
+[class*="shadow-amber-"],
+[class*="shadow-yellow-"],
+[class*="shadow-green-"],
+[class*="shadow-emerald-"],
+[class*="shadow-lime-"],
+[class*="shadow-sky-"],
+[class*="shadow-indigo-"],
+[class*="shadow-purple-"],
+[class*="shadow-cyan-"],
+[class*="shadow-pink-"] {
+  --tw-shadow-color: rgba(36, 48, 143, 0.16) !important;
+}
+
+[class*="from-rose-"],
+[class*="from-red-"],
+[class*="from-orange-"],
+[class*="from-amber-"],
+[class*="from-yellow-"],
+[class*="from-green-"],
+[class*="from-emerald-"],
+[class*="from-lime-"],
+[class*="from-sky-"],
+[class*="from-indigo-"],
+[class*="from-purple-"],
+[class*="from-cyan-"],
+[class*="from-pink-"],
+[class*="to-rose-"],
+[class*="to-red-"],
+[class*="to-orange-"],
+[class*="to-amber-"],
+[class*="to-yellow-"],
+[class*="to-green-"],
+[class*="to-emerald-"],
+[class*="to-lime-"],
+[class*="to-sky-"],
+[class*="to-indigo-"],
+[class*="to-purple-"],
+[class*="to-cyan-"],
+[class*="to-pink-"] {
+  --tw-gradient-from: #eef4ff var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: #f8fbff var(--tw-gradient-to-position) !important;
+}
+
+[class*="ring-rose-"],
+[class*="ring-red-"],
+[class*="ring-orange-"],
+[class*="ring-amber-"],
+[class*="ring-yellow-"],
+[class*="ring-green-"],
+[class*="ring-emerald-"],
+[class*="ring-lime-"],
+[class*="ring-sky-"],
+[class*="ring-indigo-"],
+[class*="ring-purple-"],
+[class*="ring-cyan-"],
+[class*="ring-pink-"] {
+  --tw-ring-color: rgba(36, 48, 143, 0.18) !important;
 }
 
 [class*="text-[8px]"] {
@@ -159,4 +377,26 @@ table {
     --app-font-size: 14px;
     --app-touch-target: 44px;
   }
+}
+
+/* 1080P pixel-fit baseline for POS desktop checkout */
+@media (min-width: 1800px) and (min-height: 980px) {
+  .pos-1080 {
+    grid-template-rows: 64px minmax(0, 1fr) !important;
+    grid-template-columns: 190px minmax(0, 1fr) 320px !important;
+  }
+  .pos-1080 .pos-topbar { height: 64px; padding-left: 16px; padding-right: 16px; }
+  .pos-1080 .pos-brand { font-size: 30px; letter-spacing: -0.02em; line-height: 1; }
+  .pos-1080 .pos-leftnav { padding: 12px; }
+  .pos-1080 .pos-nav-btn { height: 38px; padding-top: 8px; padding-bottom: 8px; }
+  .pos-1080 .pos-cat-btn { height: 34px; padding-top: 6px; padding-bottom: 6px; }
+  .pos-1080 .pos-add-btn { height: 44px; border-radius: 10px; }
+  .pos-1080 .pos-catalog { padding: 16px 18px; }
+  .pos-1080 .pos-order { border-left: 1px solid #e2e8f0; }
+  .pos-1080 .pos-product-grid { gap: 14px; }
+  .pos-1080 .pos-product-card { border-radius: 12px; padding: 10px; }
+  .pos-1080 .pos-product-card img { border-radius: 8px; }
+  .pos-1080 .pos-order-row { min-height: 52px; }
+  .pos-1080 .pos-order-total { padding-top: 10px; margin-top: 2px; }
+  .pos-1080 .pos-pay-btn { height: 44px; border-radius: 10px; font-size: 1.7rem; }
 }

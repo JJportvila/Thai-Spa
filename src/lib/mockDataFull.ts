@@ -1,4 +1,4 @@
-import { StretProduct } from './productLogic';
+﻿import { StretProduct } from './productLogic';
 
 export interface Customer {
   id: string;
@@ -34,45 +34,21 @@ const vanuatuBrands = [
 const categories = [
   { name: 'Beverage', zones: ['Blue', 'Green'] },
   { name: 'Snack', zones: ['Red'] },
-  { name: 'Staple', zones: ['Yellow'] },
-  { name: 'Household', zones: ['Yellow'] },
+  { name: 'Staple', zones: ['Blue'] },
+  { name: 'Household', zones: ['Blue'] },
   { name: 'Produce', zones: ['Green'] }
 ];
 
 const buildProductImage = (title: string, category: string, zone: string): string => {
-  const palette: Record<string, { bg: string; fg: string }> = {
-    Blue: { bg: '#0ea5e9', fg: '#ffffff' },
-    Green: { bg: '#10b981', fg: '#ffffff' },
-    Red: { bg: '#ef4444', fg: '#ffffff' },
-    Yellow: { bg: '#f59e0b', fg: '#111827' },
+  const imageMap: Record<string, string> = {
+    Beverage: 'https://images.unsplash.com/photo-1527613426441-4da17471b66d?auto=format&fit=crop&w=900&q=80',
+    Snack: 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=900&q=80',
+    Staple: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=900&q=80',
+    Household: 'https://images.unsplash.com/photo-1583947215259-38e31be8751f?auto=format&fit=crop&w=900&q=80',
+    Produce: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=80',
   };
-  const iconMap: Record<string, string> = {
-    Beverage: 'DRINK',
-    Snack: 'SNACK',
-    Staple: 'STAPLE',
-    Household: 'HOME',
-    Produce: 'FRESH',
-  };
-
-  const p = palette[zone] || { bg: '#334155', fg: '#ffffff' };
-  const badge = iconMap[category] || 'ITEM';
-  const short = title.replace(/\s+\(Batch-\d+\)$/, '').slice(0, 24);
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-      <defs>
-        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="${p.bg}" stop-opacity="0.95"/>
-          <stop offset="100%" stop-color="#0f172a" stop-opacity="0.9"/>
-        </linearGradient>
-      </defs>
-      <rect width="512" height="512" rx="42" fill="url(#g)"/>
-      <rect x="38" y="38" width="436" height="436" rx="28" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="3"/>
-      <text x="44" y="98" fill="${p.fg}" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="800">${badge}</text>
-      <text x="44" y="170" fill="${p.fg}" font-family="Inter, Arial, sans-serif" font-size="36" font-weight="900">${short}</text>
-      <text x="44" y="454" fill="${p.fg}" font-family="Inter, Arial, sans-serif" font-size="24" opacity="0.9">STRET POS</text>
-    </svg>
-  `;
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  const fallback = imageMap[category] || imageMap.Beverage;
+  return `${fallback}&sig=${encodeURIComponent(`${title}-${zone}`)}`;
 };
 
 const generateVanuatuInventory = (count: number): StretProduct[] => {
@@ -85,22 +61,22 @@ const generateVanuatuInventory = (count: number): StretProduct[] => {
     { title: 'Azure Pure Water 600ml', category: 'Beverage', barcodePrefix: '742', zone: 'Green' },
     { title: 'Switi Lemonade 500ml', category: 'Beverage', barcodePrefix: '678', zone: 'Blue' },
     { title: 'Switi Cola 500ml', category: 'Beverage', barcodePrefix: '678', zone: 'Blue' },
-    { title: 'Tanna Coffee Medium Roast 250g', category: 'Staple', barcodePrefix: '678', zone: 'Yellow' },
-    { title: 'Tanna Coffee Dark Roast 250g', category: 'Staple', barcodePrefix: '678', zone: 'Yellow' },
+    { title: 'Tanna Coffee Medium Roast 250g', category: 'Staple', barcodePrefix: '678', zone: 'Blue' },
+    { title: 'Tanna Coffee Dark Roast 250g', category: 'Staple', barcodePrefix: '678', zone: 'Blue' },
     { title: 'Lapita Cassava Chips Salted', category: 'Snack', barcodePrefix: '678', zone: 'Red' },
     { title: 'Lapita Taro Chips Chilli', category: 'Snack', barcodePrefix: '678', zone: 'Red' },
     { title: 'Lapita Banana Chips Sweet', category: 'Snack', barcodePrefix: '678', zone: 'Red' },
     { title: 'Fine Foods Cream Crackers', category: 'Snack', barcodePrefix: '678', zone: 'Red' },
     { title: 'Fine Foods Digestive Biscuits', category: 'Snack', barcodePrefix: '678', zone: 'Red' },
     { title: 'Aore Island Dark Chocolate 100g', category: 'Snack', barcodePrefix: '678', zone: 'Red' },
-    { title: 'Vanuatu Kava Powder (Grade A) 1kg', category: 'Staple', barcodePrefix: '678', zone: 'Yellow' },
-    { title: 'Vanuatu Kava Powder (Instant) 250g', category: 'Staple', barcodePrefix: '678', zone: 'Yellow' },
-    { title: 'Santo Beef Corned 340g', category: 'Staple', barcodePrefix: '678', zone: 'Yellow' },
-    { title: 'Santo Beef Premium Steak 500g', category: 'Staple', barcodePrefix: '678', zone: 'Yellow' },
-    { title: 'Punjas Flour 1kg', category: 'Staple', barcodePrefix: '742', zone: 'Yellow' },
-    { title: 'Punjas Rice 5kg', category: 'Staple', barcodePrefix: '742', zone: 'Yellow' },
-    { title: 'Island Dress Fabric (Vibrant Blue)', category: 'Household', barcodePrefix: '678', zone: 'Yellow' },
-    { title: 'Belo Soap (Local Coconut)', category: 'Household', barcodePrefix: '678', zone: 'Yellow' },
+    { title: 'Vanuatu Kava Powder (Grade A) 1kg', category: 'Staple', barcodePrefix: '678', zone: 'Blue' },
+    { title: 'Vanuatu Kava Powder (Instant) 250g', category: 'Staple', barcodePrefix: '678', zone: 'Blue' },
+    { title: 'Santo Beef Corned 340g', category: 'Staple', barcodePrefix: '678', zone: 'Blue' },
+    { title: 'Santo Beef Premium Steak 500g', category: 'Staple', barcodePrefix: '678', zone: 'Blue' },
+    { title: 'Punjas Flour 1kg', category: 'Staple', barcodePrefix: '742', zone: 'Blue' },
+    { title: 'Punjas Rice 5kg', category: 'Staple', barcodePrefix: '742', zone: 'Blue' },
+    { title: 'Island Dress Fabric (Vibrant Blue)', category: 'Household', barcodePrefix: '678', zone: 'Blue' },
+    { title: 'Belo Soap (Local Coconut)', category: 'Household', barcodePrefix: '678', zone: 'Blue' },
   ];
 
   for (let i = 0; i < count; i++) {
@@ -141,3 +117,4 @@ export const mockSuppliers: Supplier[] = [
   { id: 'SUP-004', name: 'Pacific Staples Imports', contactPerson: 'Kevin W.', email: 'ops@pacstaples.vu', phone: '+678 27889', category: 'General Goods', status: 'ON_HOLD', totalPurchased: 2300000, lastDelivery: '2024-02-10', rating: 3.2 },
   { id: 'SUP-005', name: 'Santo Coffee Roasters', contactPerson: 'Elena R.', email: 'beans@santocoffee.vu', phone: '+678 33445', category: 'Beverages', status: 'ACTIVE', totalPurchased: 450000, lastDelivery: '2024-03-01', rating: 4.7 },
 ];
+

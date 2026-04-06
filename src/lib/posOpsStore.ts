@@ -1,3 +1,5 @@
+import { getCachedSharedState, loadSharedState, saveSharedState } from './sharedStateStore';
+
 export type PosPaymentMethod = 'CASH' | 'CARD' | 'STRET_PAY' | 'CHECK';
 
 export interface PosSaleRecord {
@@ -46,7 +48,7 @@ export interface PosMonthClosure {
   paymentBreakdown: Record<PosPaymentMethod, number>;
 }
 
-interface PosOpsState {
+export interface PosOpsState {
   activeShift: PosShiftSession | null;
   shifts: PosShiftSession[];
   sales: PosSaleRecord[];
@@ -54,8 +56,7 @@ interface PosOpsState {
   monthClosures: PosMonthClosure[];
 }
 
-const KEY_PREFIX = 'stretpos.posops.';
-const getKey = (accountId: string) => `${KEY_PREFIX}${accountId}`;
+const POS_OPS_STATE_KEY = 'pos_ops_state';
 
 const emptyState = (): PosOpsState => ({
   activeShift: null,
@@ -70,28 +71,33 @@ const getBusinessMonth = (iso: string) => new Date(iso).toISOString().slice(0, 7
 
 export const getPosOpsState = (accountId: string): PosOpsState => {
   if (!accountId) return emptyState();
-  try {
-    const raw = localStorage.getItem(getKey(accountId));
-    if (!raw) return emptyState();
-    const parsed = JSON.parse(raw) as PosOpsState;
-    if (!parsed || typeof parsed !== 'object') return emptyState();
-    return {
-      activeShift: parsed.activeShift || null,
-      shifts: parsed.shifts || [],
-      sales: parsed.sales || [],
-      dayClosures: parsed.dayClosures || [],
-      monthClosures: parsed.monthClosures || [],
-    };
-  } catch {
-    return emptyState();
-  }
+  const parsed = getCachedSharedState(accountId, POS_OPS_STATE_KEY, emptyState()) as PosOpsState;
+  if (!parsed || typeof parsed !== 'object') return emptyState();
+  return {
+    activeShift: parsed.activeShift || null,
+    shifts: parsed.shifts || [],
+    sales: parsed.sales || [],
+    dayClosures: parsed.dayClosures || [],
+    monthClosures: parsed.monthClosures || [],
+  };
 };
 
 const setPosOpsState = (accountId: string, state: PosOpsState) => {
   if (!accountId) return;
-  try {
-    localStorage.setItem(getKey(accountId), JSON.stringify(state));
-  } catch {}
+  void saveSharedState(accountId, POS_OPS_STATE_KEY, state);
+};
+
+export const syncPosOpsState = async (accountId: string): Promise<PosOpsState> => {
+  if (!accountId) return emptyState();
+  const local = getPosOpsState(accountId);
+  const synced = await loadSharedState(accountId, POS_OPS_STATE_KEY, local);
+  return {
+    activeShift: synced.activeShift || null,
+    shifts: synced.shifts || [],
+    sales: synced.sales || [],
+    dayClosures: synced.dayClosures || [],
+    monthClosures: synced.monthClosures || [],
+  };
 };
 
 export const startPosShift = (accountId: string, cashierName: string) => {

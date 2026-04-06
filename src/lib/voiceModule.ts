@@ -1,4 +1,4 @@
-import { StretProduct } from './productLogic';
+﻿import { StretProduct } from './productLogic';
 
 /**
  * Stret Voice Module
@@ -21,24 +21,22 @@ export const speakProductLocation = (product: StretProduct, lang: string = 'en')
 
   if (lang === 'bi') {
     // Bislama instructions
-    const zoneMap: Record<string, string> = {
-      'Green': 'GRIN Aria',
-      'Red': 'RED Aria',
-      'Blue': 'BLU Aria',
-      'Yellow': 'YELO Aria'
-    };
+      const zoneMap: Record<string, string> = {
+       'Green': 'GRIN Aria',
+       'Red': 'RED Aria',
+       'Blue': 'BLU Aria'
+     };
     const zoneName = zoneMap[product.zoneColor] || product.zoneColor;
     text = `Yu go long ${zoneName}. Self ${product.shelfId}. Row ${product.rowNum}. Col ${colLetter}.`;
   } else if (lang === 'zh_CN') {
     // Chinese instructions
-    const zoneMap: Record<string, string> = {
-      'Green': '绿色区域',
-      'Red': '红色区域',
-      'Blue': '蓝色区域',
-      'Yellow': '黄色区域'
-    };
+     const zoneMap: Record<string, string> = {
+       'Green': '绿色区域',
+       'Red': '红色区域',
+       'Blue': '蓝色区域'
+     };
     const zoneName = zoneMap[product.zoneColor] || product.zoneColor;
-    text = `请前往${zoneName}。货架 ${product.shelfId}。第 ${product.rowNum} 排。第 ${colLetter} 行。`;
+    text = `请前往${zoneName}。货架${product.shelfId}。第 ${product.rowNum} 排。第 ${colLetter} 列。`;
   } else {
     // Default English
     text = `Go to ${product.zoneColor} Area. Shelf ${product.shelfId}. Row ${product.rowNum}. Column ${colLetter}.`;
@@ -74,3 +72,4 @@ export const speakAlert = (message: string, lang: string = 'en') => {
   utterance.pitch = 1.2;
   window.speechSynthesis.speak(utterance);
 };
+

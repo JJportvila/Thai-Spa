@@ -4,11 +4,12 @@ export interface StretProduct {
   id: string;
   title: string;        // Supports English and Bislama via i18n
   barcode: string;      // Barcode for scanning
-  zoneColor: 'Green' | 'Red' | 'Blue' | 'Yellow'; // Area color
+  zoneColor: 'Green' | 'Red' | 'Blue'; // Area color
   shelfId: string;      // Shelf ID (e.g., A1, B2)
   rowNum: number;       // Level
   colNum: number;       // Position
   stock: number;        // Current inventory count
+  safetyStock?: number; // Safety stock threshold
   imageUrl?: string;    // Real product image
   category?: string;    // Product category
 }

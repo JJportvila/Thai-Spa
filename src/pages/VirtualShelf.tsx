@@ -14,13 +14,12 @@ import { extendedVanuatuProducts } from '../lib/mockDataFull';
 import { StretProduct } from '../lib/productLogic';
 
 const VirtualShelfPage: React.FC = () => {
-  const [selectedZone, setSelectedZone] = useState<'Green' | 'Red' | 'Blue' | 'Yellow'>('Green');
+  const [selectedZone, setSelectedZone] = useState<'Green' | 'Red' | 'Blue'>('Green');
   const [selectedShelf, setSelectedShelf] = useState('A1');
-  const zoneNameMap: Record<'Green' | 'Red' | 'Blue' | 'Yellow', string> = {
+  const zoneNameMap: Record<'Green' | 'Red' | 'Blue', string> = {
     Green: '绿区',
     Red: '红区',
     Blue: '蓝区',
-    Yellow: '黄区',
   };
   
   // Grid config
@@ -28,10 +27,9 @@ const VirtualShelfPage: React.FC = () => {
   const cols = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   const zones = [
-    { id: 'Green', name: zoneNameMap.Green, color: 'bg-emerald-500', shadow: 'shadow-emerald-200' },
-    { id: 'Red', name: zoneNameMap.Red, color: 'bg-rose-500', shadow: 'shadow-rose-200' },
-    { id: 'Blue', name: zoneNameMap.Blue, color: 'bg-sky-500', shadow: 'shadow-sky-200' },
-    { id: 'Yellow', name: zoneNameMap.Yellow, color: 'bg-amber-500', shadow: 'shadow-amber-200' },
+    { id: 'Green', name: zoneNameMap.Green, color: 'bg-[#1a237e]', shadow: 'shadow-slate-200' },
+    { id: 'Red', name: zoneNameMap.Red, color: 'bg-[#1a237e]', shadow: 'shadow-slate-200' },
+    { id: 'Blue', name: zoneNameMap.Blue, color: 'bg-[#1a237e]', shadow: 'shadow-slate-200' },
   ];
 
   const getProductAt = (row: number, col: number) => {
@@ -54,7 +52,7 @@ const VirtualShelfPage: React.FC = () => {
       <div className="ui-card bg-white rounded-[24px] sm:rounded-[32px] p-5 sm:p-8 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-1">
           <h2 className="text-2xl font-black text-slate-800 flex items-center gap-3">
-             <Grid3X3 className="text-sky-500" /> 虚拟货架地图
+             <Grid3X3 className="text-[#1a237e]" /> 虚拟货架地图
           </h2>
           <p className="text-slate-400 text-sm font-medium">实时查看仓库分区占用率与库存分布。</p>
         </div>
@@ -92,15 +90,15 @@ const VirtualShelfPage: React.FC = () => {
              <div className="grid grid-cols-2 gap-4">
                 <div className="bg-slate-800 p-4 rounded-2xl space-y-1">
                    <div className="text-[9px] font-black uppercase text-slate-500">占用率</div>
-                   <div className="text-xl font-black text-sky-400">{calculateOccupancy()}%</div>
+                   <div className="text-xl font-black text-[#1a237e]">{calculateOccupancy()}%</div>
                 </div>
                 <div className="bg-slate-800 p-4 rounded-2xl space-y-1">
                    <div className="text-[9px] font-black uppercase text-slate-500">商品总数</div>
-                   <div className="text-xl font-black text-emerald-400">{extendedVanuatuProducts.filter(p => p.zoneColor === selectedZone).length}</div>
+                   <div className="text-xl font-black text-[#1a237e]">{extendedVanuatuProducts.filter(p => p.zoneColor === selectedZone).length}</div>
                 </div>
              </div>
 
-             <div className="p-5 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-3xl space-y-4 shadow-xl shadow-sky-500/20">
+             <div className="p-5 bg-gradient-to-br from-[#eef4ff] to-[#f8f9fa] rounded-3xl space-y-4 shadow-xl shadow-slate-200">
                 <div className="flex items-center gap-3">
                    <Info size={18} className="text-white/80" />
                    <span className="text-xs font-black uppercase tracking-widest text-white">网格说明</span>
@@ -137,10 +135,10 @@ const VirtualShelfPage: React.FC = () => {
                                 whileHover={{ scale: 1.05 }}
                                 className={`flex-1 aspect-square rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-1 cursor-pointer group relative ${
                                   product 
-                                  ? `${selectedZone === 'Green' ? 'bg-emerald-500 border-emerald-600' : 
-                                      selectedZone === 'Red' ? 'bg-rose-500 border-rose-600' : 
-                                      selectedZone === 'Blue' ? 'bg-sky-500 border-sky-600' : 
-                                      'bg-amber-500 border-amber-600'} text-white shadow-lg` 
+                                  ? `${selectedZone === 'Green' ? 'bg-[#1a237e] border-[#dbe7ff]' : 
+                                      selectedZone === 'Red' ? 'bg-[#1a237e] border-[#dbe7ff]' : 
+                                      selectedZone === 'Blue' ? 'bg-[#1a237e] border-[#dbe7ff]' : 
+                                      'bg-[#1a237e] border-[#dbe7ff]'} text-white shadow-lg` 
                                   : 'bg-slate-50 border-slate-100 hover:border-slate-300'
                                 }`}
                               >
@@ -151,7 +149,7 @@ const VirtualShelfPage: React.FC = () => {
                                     
                                     {/* Tooltip */}
                                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-slate-900 text-white p-3 rounded-xl text-[10px] font-bold opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50 shadow-2xl">
-                                       <div className="text-sky-400 mb-1">{product.title}</div>
+                                       <div className="text-[#1a237e] mb-1">{product.title}</div>
                                        <div className="text-white/50">{product.barcode}</div>
                                     </div>
                                   </>
@@ -173,9 +171,9 @@ const VirtualShelfPage: React.FC = () => {
                 <div className="w-3 h-3 rounded bg-slate-100 border border-slate-200" /> 空位
              </div>
              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-emerald-500 shadow-md" /> 已占用
+                <div className="w-3 h-3 rounded bg-[#1a237e] shadow-md" /> 已占用
              </div>
-             <div className="flex items-center gap-2 text-rose-500">
+             <div className="flex items-center gap-2 text-[#1a237e]">
                 <AlertCircle size={14} /> 低库存预警（{"<5"}）
              </div>
           </div>
@@ -186,4 +184,6 @@ const VirtualShelfPage: React.FC = () => {
 };
 
 export default VirtualShelfPage;
+
+
 

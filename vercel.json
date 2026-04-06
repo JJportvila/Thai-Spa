@@ -1,0 +1,26 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.essvu.com"
+        }
+      ],
+      "destination": "https://ess.essvu.com/$1",
+      "permanent": true
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "essvu.com"
+        }
+      ],
+      "destination": "https://ess.essvu.com/$1",
+      "permanent": true
+    }
+  ]
+}

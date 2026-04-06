@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Grid as ThreeGrid, Text, PerspectiveCamera, Environment, ContactShadows, Line, Sphere, Html, Float } from '@react-three/drei';
 import * as THREE from 'three';
+import { getCachedSharedState, loadSharedState, saveSharedState } from '../lib/sharedStateStore';
 
 // --- PHOTO-REALISTIC RETAIL & ARCHITECTURE MODELS ---
 
@@ -117,15 +118,26 @@ const Canvas2DEngine = ({ objects, selectedId, onSelect, onUpdate, dims, autoSca
 };
 
 const WarehouseShelfManagement: React.FC = () => {
+  const LAYOUT_ACCOUNT_ID = 'GLOBAL';
+  const LAYOUT_STATE_KEY = 'warehouse_layout_v3';
   const [viewMode, setViewMode] = useState<'DESIGN' | 'REALITY'>('DESIGN');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [dims, setDims] = useState({ length: 44, width: 22, height: 6 });
   const [objects, setObjects] = useState<any[]>(() => {
-     const saved = localStorage.getItem('ultra_store_v3');
-     return saved ? JSON.parse(saved) : [{ id: 'core_wall', type: 'WALL', name: 'Internal Load Wall', x: 0, y: 0, l: 0.2, w: 10, h: 5, rotation: 0, color: '#334155' }];
+     const saved = getCachedSharedState<any[]>(LAYOUT_ACCOUNT_ID, LAYOUT_STATE_KEY, []);
+     return saved.length > 0 ? saved : [{ id: 'core_wall', type: 'WALL', name: 'Internal Load Wall', x: 0, y: 0, l: 0.2, w: 10, h: 5, rotation: 0, color: '#334155' }];
   });
   const [autoScale, setAutoScale] = useState(15);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    void (async () => {
+      const synced = await loadSharedState<any[]>(LAYOUT_ACCOUNT_ID, LAYOUT_STATE_KEY, objects);
+      if (Array.isArray(synced) && synced.length > 0) {
+        setObjects(synced);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     const update = () => { if (!containerRef.current) return; setAutoScale(Math.min((containerRef.current.clientWidth - 150) / dims.length, (containerRef.current.clientHeight - 150) / dims.width)); };
@@ -157,45 +169,45 @@ const WarehouseShelfManagement: React.FC = () => {
     <div className="w-full min-h-screen bg-[#f3f4f6] flex flex-col font-sans overflow-hidden">
        {/* LUXURY TOP BAR */}
        <div className="ui-card min-h-14 bg-white/80 backdrop-blur-3xl border-b border-slate-200 flex flex-col lg:flex-row items-start lg:items-center justify-between px-3 sm:px-6 lg:px-8 py-2 gap-2 z-[100]">
-          <div className="flex items-center gap-3 sm:gap-4"><div className="w-9 h-9 bg-slate-900 rounded-xl flex items-center justify-center text-white font-black">S</div><span className="text-xs sm:text-sm font-black italic tracking-tighter text-slate-800 uppercase tracking-[3px] sm:tracking-[4px]">Architect Studio v8.0</span></div>
+          <div className="flex items-center gap-3 sm:gap-4"><div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center text-[#1a237e] font-black">S</div><span className="text-xs sm:text-sm font-black italic tracking-tighter text-slate-800 uppercase tracking-[3px] sm:tracking-[4px]">Architect Studio v8.0</span></div>
           <div className="flex bg-slate-100 p-1.5 rounded-2xl gap-2 border border-slate-200 shadow-inner w-full lg:w-auto">
-             <button onClick={() => setViewMode('DESIGN')} className={`flex-1 lg:flex-none px-4 sm:px-6 lg:px-8 py-2 rounded-xl text-[11px] font-black uppercase transition-all flex items-center justify-center gap-2 ${viewMode === 'DESIGN' ? 'bg-white shadow-xl text-slate-900 scale-[1.02]' : 'text-slate-400'}`}><PenTool size={16}/> CAD Blueprint</button>
-             <button onClick={() => setViewMode('REALITY')} className={`flex-1 lg:flex-none px-4 sm:px-6 lg:px-8 py-2 rounded-xl text-[11px] font-black uppercase transition-all flex items-center justify-center gap-2 ${viewMode === 'REALITY' ? 'bg-slate-900 shadow-2xl text-white scale-[1.02]' : 'text-slate-400'}`}><Eye size={16}/> 3D Reality</button>
+             <button onClick={() => setViewMode('DESIGN')} className={`flex-1 lg:flex-none px-4 sm:px-6 lg:px-8 py-2 rounded-xl text-[11px] font-black uppercase transition-all flex items-center justify-center gap-2 ${viewMode === 'DESIGN' ? 'bg-white shadow-xl text-slate-900 scale-[1.02]' : 'text-slate-500'}`}><PenTool size={16}/> CAD Blueprint</button>
+             <button onClick={() => setViewMode('REALITY')} className={`flex-1 lg:flex-none px-4 sm:px-6 lg:px-8 py-2 rounded-xl text-[11px] font-black uppercase transition-all flex items-center justify-center gap-2 ${viewMode === 'REALITY' ? 'bg-white shadow-2xl text-[#1a237e] scale-[1.02]' : 'text-slate-500'}`}><Eye size={16}/> 3D Reality</button>
           </div>
-          <button onClick={() => { localStorage.setItem('ultra_store_v3', JSON.stringify(objects)); alert('Saved to LocalStorage'); }} className="h-9 w-full lg:w-auto px-6 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase shadow-lg">Save Drawing</button>
+          <button onClick={() => { void saveSharedState(LAYOUT_ACCOUNT_ID, LAYOUT_STATE_KEY, objects); alert('Saved to Supabase'); }} className="h-9 w-full lg:w-auto px-6 bg-[#1a237e] text-[#1a237e] rounded-xl text-[10px] font-black uppercase shadow-lg">Save Drawing</button>
        </div>
 
        <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative">
           {/* ARCHITECTURAL ASSET DRAWER */}
           <div className="ui-card w-full lg:w-72 bg-white border-b lg:border-b-0 lg:border-r border-slate-200 p-4 sm:p-6 flex flex-col space-y-5 sm:space-y-8 max-h-[38vh] lg:max-h-none">
-             <div className="flex items-center justify-between text-[11px] font-black text-slate-400 uppercase tracking-widest"><span>ASSET LIBRARY</span><Library size={14}/></div>
+             <div className="flex items-center justify-between text-[11px] font-black text-slate-500 uppercase tracking-widest"><span>ASSET LIBRARY</span><Library size={14}/></div>
              
              <div className="flex-1 space-y-6 overflow-y-auto pr-2 scrollbar-hide">
                 {/* ARCHITECTURE */}
                 <div className="space-y-3">
-                   <h4 className="text-[9px] font-black text-slate-300 uppercase italic">Architecture & Openings</h4>
+                   <h4 className="text-[9px] font-black text-slate-400 uppercase italic">Architecture & Openings</h4>
                    <div className="grid grid-cols-3 lg:grid-cols-2 gap-2">
-                       <button onClick={() => spawn('WALL', 'Internal Wall', 8, 0.2, 5.0)} className="p-3 bg-slate-50 rounded-xl hover:bg-slate-900 hover:text-white transition-all text-center"><Layout size={18} className="mx-auto mb-1"/><span className="text-[8px] font-bold">INTERIOR WALL</span></button>
-                       <button onClick={() => spawn('DOOR', 'Entrance Door', 1.2, 0.4, 2.5)} className="p-3 bg-slate-50 rounded-xl hover:bg-slate-900 hover:text-white transition-all text-center"><DoorOpen size={18} className="mx-auto mb-1"/><span className="text-[8px] font-bold">GLASS DOOR</span></button>
-                       <button onClick={() => spawn('WINDOW', 'Display Window', 3.0, 0.2, 2.0)} className="p-3 bg-slate-50 rounded-xl hover:bg-slate-900 hover:text-white transition-all text-center"><Maximize size={18} className="mx-auto mb-1"/><span className="text-[8px] font-bold">WINDOW</span></button>
+                       <button onClick={() => spawn('WALL', 'Internal Wall', 8, 0.2, 5.0)} className="p-3 bg-slate-50 rounded-xl hover:bg-white hover:text-[#1a237e] transition-all text-center"><Layout size={18} className="mx-auto mb-1"/><span className="text-[8px] font-bold">INTERIOR WALL</span></button>
+                       <button onClick={() => spawn('DOOR', 'Entrance Door', 1.2, 0.4, 2.5)} className="p-3 bg-slate-50 rounded-xl hover:bg-white hover:text-[#1a237e] transition-all text-center"><DoorOpen size={18} className="mx-auto mb-1"/><span className="text-[8px] font-bold">GLASS DOOR</span></button>
+                       <button onClick={() => spawn('WINDOW', 'Display Window', 3.0, 0.2, 2.0)} className="p-3 bg-slate-50 rounded-xl hover:bg-white hover:text-[#1a237e] transition-all text-center"><Maximize size={18} className="mx-auto mb-1"/><span className="text-[8px] font-bold">WINDOW</span></button>
                    </div>
                 </div>
 
                 {/* RETAIL ASSETS (PREV) */}
                 <div className="space-y-3">
-                   <h4 className="text-[9px] font-black text-slate-300 uppercase italic">Retail & Shelving</h4>
+                   <h4 className="text-[9px] font-black text-slate-400 uppercase italic">Retail & Shelving</h4>
                    <div className="grid grid-cols-3 lg:grid-cols-2 gap-2">
-                       <button onClick={() => spawn('SHELF', 'Standard Rack', 5, 2, 4.5)} className="p-3 bg-slate-50 rounded-xl hover:bg-slate-900 hover:text-white transition-all text-center"><Layers size={18} className="mx-auto mb-1"/><span className="text-[8px] font-bold">STEEL RACK</span></button>
-                       <button onClick={() => spawn('COOLER', '3-Door Beverage', 4.5, 1.2, 2.2, { doors: 3 })} className="p-3 bg-slate-50 rounded-xl hover:bg-slate-900 hover:text-white transition-all text-center"><Refrigerator size={18} className="mx-auto mb-1"/><span className="text-[8px] font-bold">FRIDGE</span></button>
+                       <button onClick={() => spawn('SHELF', 'Standard Rack', 5, 2, 4.5)} className="p-3 bg-slate-50 rounded-xl hover:bg-white hover:text-[#1a237e] transition-all text-center"><Layers size={18} className="mx-auto mb-1"/><span className="text-[8px] font-bold">STEEL RACK</span></button>
+                       <button onClick={() => spawn('COOLER', '3-Door Beverage', 4.5, 1.2, 2.2, { doors: 3 })} className="p-3 bg-slate-50 rounded-xl hover:bg-white hover:text-[#1a237e] transition-all text-center"><Refrigerator size={18} className="mx-auto mb-1"/><span className="text-[8px] font-bold">FRIDGE</span></button>
                    </div>
                 </div>
 
                 {/* ELECTRONICS (PREV) */}
                 <div className="space-y-3">
-                   <h4 className="text-[9px] font-black text-slate-300 uppercase italic">Appliances</h4>
+                   <h4 className="text-[9px] font-black text-slate-400 uppercase italic">Appliances</h4>
                    <div className="grid grid-cols-3 lg:grid-cols-2 gap-2">
-                       <button onClick={() => spawn('AC', 'Smart Wall AC', 1.2, 0.4, 0.4)} className="p-3 bg-slate-50 rounded-xl hover:bg-slate-900 hover:text-white transition-all text-center"><Wind size={18} className="mx-auto mb-1"/><span className="text-[8px] font-bold">AC UNIT</span></button>
-                       <button onClick={() => spawn('CCTV', '360Dome Camera', 0.5, 0.5, 0.5)} className="p-3 bg-slate-50 rounded-xl hover:bg-slate-900 hover:text-white transition-all text-center"><Video size={18} className="mx-auto mb-1"/><span className="text-[8px] font-bold">CCTV</span></button>
+                       <button onClick={() => spawn('AC', 'Smart Wall AC', 1.2, 0.4, 0.4)} className="p-3 bg-slate-50 rounded-xl hover:bg-white hover:text-[#1a237e] transition-all text-center"><Wind size={18} className="mx-auto mb-1"/><span className="text-[8px] font-bold">AC UNIT</span></button>
+                       <button onClick={() => spawn('CCTV', '360Dome Camera', 0.5, 0.5, 0.5)} className="p-3 bg-slate-50 rounded-xl hover:bg-white hover:text-[#1a237e] transition-all text-center"><Video size={18} className="mx-auto mb-1"/><span className="text-[8px] font-bold">CCTV</span></button>
                    </div>
                 </div>
              </div>
@@ -237,4 +249,5 @@ const WarehouseShelfManagement: React.FC = () => {
 };
 
 export default WarehouseShelfManagement;
+
 

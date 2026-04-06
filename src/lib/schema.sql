@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS products (
     title_en TEXT NOT NULL,
     title_bi TEXT,
     category TEXT,
-    zone_color TEXT CHECK (zone_color IN ('Green', 'Red', 'Blue', 'Yellow')),
+    zone_color TEXT CHECK (zone_color IN ('Green', 'Red', 'Blue')),
     shelf_id TEXT,
     row_num INT,
     col_num INT,
