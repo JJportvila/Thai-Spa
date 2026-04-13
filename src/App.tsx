@@ -55,15 +55,13 @@ import WarehouseShelfManagementPage from './pages/WarehouseShelfManagement';
 import ManagementMenuPage from './pages/ManagementMenu';
 import EmployeeAccountManagementPage from './pages/EmployeeAccountManagement';
 import MyInventoryPage from './pages/MyInventory';
-import CustomerHomePage from './pages/CustomerHomePage';
 
 type UserRole = 'PLATFORM' | 'WHOLESALER' | 'RETAILER';
-type View = 'customer_home' | 'customer-home' | 'dashboard' | 'supplier-entry' | 'driver-app' | 'finance-board' | 'vat-returns' | 'scanner' | 'virtual-shelf' | 'warehouse-mgmt' | 'inventory-mgmt' | 'my-inventory' | 'management-menu' | 'employee-mgmt' | 'supply-chain' | 'ecosystem' | 'auto-split' | 'retail-pos' | 'retail-tools' | 'label-print' | 'wholesale-pos' | 'artery' | 'global-wholesale' | 'customs-docs' | 'digital-archive' | 'fleet-mgmt' | 'wholesaler-home' | 'retailer-home' | 'customer-mgmt' | 'supplier-mgmt' | 'warehouse-shelf';
+type View = 'dashboard' | 'supplier-entry' | 'driver-app' | 'finance-board' | 'vat-returns' | 'scanner' | 'virtual-shelf' | 'warehouse-mgmt' | 'inventory-mgmt' | 'my-inventory' | 'management-menu' | 'employee-mgmt' | 'supply-chain' | 'ecosystem' | 'auto-split' | 'retail-pos' | 'retail-tools' | 'label-print' | 'wholesale-pos' | 'artery' | 'global-wholesale' | 'customs-docs' | 'digital-archive' | 'fleet-mgmt' | 'wholesaler-home' | 'retailer-home' | 'customer-mgmt' | 'supplier-mgmt' | 'warehouse-shelf';
 const SESSION_KEY_PREFIX = 'stretpos.session.';
 const VIEW_KEY_PREFIX = 'stretpos.activeView.';
 const ACTIVE_ROLE_KEY = 'stretpos.activeRole';
-const HOME_VIEW: View = 'customer_home';
-const VIEW_IDS: View[] = ['customer_home', 'customer-home', 'dashboard', 'supplier-entry', 'driver-app', 'finance-board', 'vat-returns', 'scanner', 'virtual-shelf', 'warehouse-mgmt', 'inventory-mgmt', 'my-inventory', 'management-menu', 'employee-mgmt', 'supply-chain', 'ecosystem', 'auto-split', 'retail-pos', 'retail-tools', 'label-print', 'wholesale-pos', 'artery', 'global-wholesale', 'customs-docs', 'digital-archive', 'fleet-mgmt', 'wholesaler-home', 'retailer-home', 'customer-mgmt', 'supplier-mgmt', 'warehouse-shelf'];
+const VIEW_IDS: View[] = ['dashboard', 'supplier-entry', 'driver-app', 'finance-board', 'vat-returns', 'scanner', 'virtual-shelf', 'warehouse-mgmt', 'inventory-mgmt', 'my-inventory', 'management-menu', 'employee-mgmt', 'supply-chain', 'ecosystem', 'auto-split', 'retail-pos', 'retail-tools', 'label-print', 'wholesale-pos', 'artery', 'global-wholesale', 'customs-docs', 'digital-archive', 'fleet-mgmt', 'wholesaler-home', 'retailer-home', 'customer-mgmt', 'supplier-mgmt', 'warehouse-shelf'];
 
 const getSessionKey = (userRole: UserRole) => `${SESSION_KEY_PREFIX}${userRole}`;
 const getViewKey = (userRole: UserRole) => `${VIEW_KEY_PREFIX}${userRole}`;
@@ -71,7 +69,6 @@ const isValidView = (value: string | null): value is View => !!value && VIEW_IDS
 const isValidRole = (value: string | null): value is UserRole => value === 'PLATFORM' || value === 'WHOLESALER' || value === 'RETAILER';
 const VIEW_TITLE_MAP: Partial<Record<View, string>> = {
   dashboard: '主仪表盘',
-  customer_home: '顾客主页',
   'supply-chain': '供应链流转控制',
   scanner: '库存扫码器',
   'retail-pos': '零售收银系统',
@@ -85,29 +82,21 @@ const VIEW_TITLE_MAP: Partial<Record<View, string>> = {
   'management-menu': '后台设置',
   'employee-mgmt': '员工账号管理',
 };
-const normalizeView = (value: string | null): View | null => {
-  if (!value) return null;
-  if (value === 'customer-home') return HOME_VIEW;
-  if (value === 'customer_home') return HOME_VIEW;
-  return isValidView(value) ? value : null;
-};
 const getSavedView = (userRole: UserRole): View => {
   try {
     const saved = localStorage.getItem(getViewKey(userRole));
-    return normalizeView(saved) ?? HOME_VIEW;
+    return isValidView(saved) ? saved : 'dashboard';
   } catch {
-    return HOME_VIEW;
+    return 'dashboard';
   }
 };
 
 const getViewFromLocation = (): View | null => {
   const hash = window.location.hash.replace(/^#\/?/, '').trim();
-  const normalizedHash = normalizeView(hash);
-  if (normalizedHash) return normalizedHash;
+  if (isValidView(hash)) return hash;
   try {
     const view = new URLSearchParams(window.location.search).get('view');
-    const normalizedView = normalizeView(view);
-    if (normalizedView) return normalizedView;
+    if (isValidView(view)) return view;
   } catch {}
   return null;
 };
@@ -136,7 +125,7 @@ const App: React.FC = () => {
 
   const initialRole = getInitialRole();
   const [role, setRole] = useState<UserRole>(initialRole);
-  const [activeView, setActiveView] = useState<View>(() => getViewFromLocation() || HOME_VIEW);
+  const [activeView, setActiveView] = useState<View>(() => getViewFromLocation() || getSavedView(initialRole));
   const [retailPosSearch, setRetailPosSearch] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -163,7 +152,7 @@ const App: React.FC = () => {
     setRole(userRole);
     setIsLoggedIn(true);
     setCurrentUser(buildUser(userRole));
-    setActiveView(getSavedView(userRole) === HOME_VIEW ? 'dashboard' : getSavedView(userRole));
+    setActiveView(getSavedView(userRole));
     setShowLoginScreen(false);
     try {
       localStorage.setItem(getSessionKey(userRole), '1');
@@ -195,11 +184,6 @@ const App: React.FC = () => {
   const handlePublicNavigate = (view: string) => {
     if (view === 'dashboard' || view === 'retail-pos' || view === 'retail-tools' || view === 'label-print' || view === 'inventory-mgmt' || view === 'my-inventory' || view === 'vat-returns' || view === 'wholesale-pos') {
       setShowLoginScreen(true);
-      return;
-    }
-    if (view === 'customer-home' || view === 'customer_home') {
-      setShowLoginScreen(false);
-      setActiveView(HOME_VIEW);
       return;
     }
     setActiveView(view as View);
@@ -639,7 +623,63 @@ const App: React.FC = () => {
                  </motion.div>
               </motion.div>
             ) : (
-              <CustomerHomePage onNavigate={handlePublicNavigate} />
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[100] bg-slate-900 flex items-center justify-center p-3 sm:p-6"
+              >
+                 <div className="absolute inset-0 overflow-hidden opacity-20">
+                    <div className="absolute top-0 left-0 w-96 h-96 bg-sky-500 blur-[150px] rounded-full -mt-48 -ml-48" />
+                    <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-500 blur-[150px] rounded-full -mb-48 -mr-48" />
+                 </div>
+                 
+                 <motion.div 
+                   initial={{ scale: 0.9, y: 20 }}
+                   animate={{ scale: 1, y: 0 }}
+                   className="bg-white rounded-[28px] sm:rounded-[48px] p-6 sm:p-12 max-w-md w-full shadow-2xl relative z-10 space-y-6 sm:space-y-10 border border-slate-100"
+                 >
+                    <div className="text-center space-y-4">
+                       <div className="w-16 h-16 sm:w-20 sm:h-20 bg-sky-500 rounded-[24px] sm:rounded-[32px] flex items-center justify-center mx-auto shadow-2xl shadow-sky-200">
+                          <span className="text-white font-black text-4xl italic">S</span>
+                       </div>
+                       <div>
+                         <h2 className="text-2xl sm:text-3xl font-black text-slate-800 uppercase tracking-tighter">Stret POS</h2>
+                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mt-1 italic">统一物流生态系统</p>
+                       </div>
+                    </div>
+    
+                    <div className="space-y-4">
+                       <p className="text-[10px] font-black text-center text-slate-500 uppercase tracking-widest">{t('login')}</p>
+                       <div className="grid grid-cols-1 gap-3">
+                          {(['PLATFORM', 'WHOLESALER', 'RETAILER'] as UserRole[]).map(r => (
+                            <button 
+                              key={r}
+                              onClick={() => handleLogin(r)}
+                              className="group w-full p-4 sm:p-5 rounded-2xl border-2 border-slate-50 hover:border-sky-500 hover:bg-sky-50 transition-all flex items-center justify-between"
+                            >
+                               <div className="flex items-center gap-4">
+                                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                                    r === 'PLATFORM' ? 'bg-sky-500 text-white' : r === 'WHOLESALER' ? 'bg-indigo-500 text-white' : 'bg-emerald-500 text-white'
+                                  }`}>
+                                     {r === 'PLATFORM' ? <ShieldCheck size={20} /> : r === 'WHOLESALER' ? <Plane size={20} /> : <ShoppingCart size={20} />}
+                                  </div>
+                                  <span className="font-black text-xs uppercase tracking-widest text-slate-700">{t(r.toLowerCase())}</span>
+                               </div>
+                               <ChevronRight size={18} className="text-slate-200 group-hover:text-sky-500 transition-colors" />
+                            </button>
+                          ))}
+                       </div>
+                    </div>
+    
+                    <div className="text-center pt-4 border-t border-slate-50">
+                       <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest leading-relaxed">
+                         由 Stret 物流网络提供 · 维拉港 2026<br/>
+                         加密安全会话
+                       </p>
+                    </div>
+                 </motion.div>
+              </motion.div>
             )}
           </AnimatePresence>
         </section>

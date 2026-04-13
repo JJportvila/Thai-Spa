@@ -599,7 +599,7 @@ const RetailPOSPage: React.FC<RetailPOSPageProps> = ({ headerSearchQuery, accoun
                 </button>
              </div>
 
-             <div className="flex-1 overflow-y-auto space-y-3 pr-1.5 custom-scrollbar relative">
+             <div className="flex-1 overflow-y-auto pr-1.5 custom-scrollbar relative">
                 <AnimatePresence>
                    {cart.length === 0 ? (
                      <div className="h-full flex flex-col items-center justify-center text-slate-500 space-y-4 opacity-50 bg-white rounded-[28px] border border-dashed border-slate-200">
@@ -607,44 +607,65 @@ const RetailPOSPage: React.FC<RetailPOSPageProps> = ({ headerSearchQuery, accoun
                      <div className="text-[10px] font-black uppercase tracking-[0.2em]">购物车为空</div>
                      </div>
                    ) : (
-                     cart.map(item => (
-                      <motion.div 
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        key={item.id} 
-                        className="bg-white p-3 rounded-2xl border border-slate-200 flex items-start gap-2.5 group shadow-sm"
-                      >
-                          <div className="flex-1 min-w-0">
-                            <div className="text-[13px] sm:text-sm font-black text-slate-900 leading-tight line-clamp-1">{item.title}</div>
-                            <div className="mt-2.5 flex items-center gap-1.5">
-                              <button 
-                                onClick={() => updateQuantity(item.id, -1)}
-                                className="w-5 h-5 !min-h-0 aspect-square p-0 rounded-sm bg-slate-100 hover:bg-[#f4f7ff] flex items-center justify-center text-slate-500 transition-all border border-slate-200 shrink-0"
-                              >
-                                <Minus size={11} />
-                              </button>
-                              <span className="text-[13px] font-black w-5 text-center text-slate-900">{item.quantity}</span>
-                              <button 
-                                onClick={() => updateQuantity(item.id, 1)}
-                                className="w-5 h-5 !min-h-0 aspect-square p-0 rounded-sm bg-white hover:bg-[#eef4ff] flex items-center justify-center text-[#1a237e] border border-slate-200 transition-all shrink-0"
-                              >
-                                <Plus size={11} />
-                              </button>
-                              <div className="ml-auto flex items-center gap-2">
-                                <div className="text-sm sm:text-base font-black text-slate-900 whitespace-nowrap text-right min-w-[5.5rem]">{formatVT(150 * item.quantity)}</div>
-                                <button 
-                                  onClick={() => removeFromCart(item.id)}
-                                  className="text-slate-400 hover:text-[#1a237e] transition-colors"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                      </motion.div>
-                    ))
-                  )}
+                     <div className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm">
+                       <table className="w-full table-fixed border-collapse">
+                         <thead className="sticky top-0 z-[1] bg-white">
+                           <tr className="border-b border-slate-200 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                             <th className="w-[44%] px-3 py-2 text-left">商品</th>
+                             <th className="w-[22%] px-2 py-2 text-center">数量</th>
+                             <th className="w-[24%] px-2 py-2 text-right">小计</th>
+                             <th className="w-[10%] px-2 py-2 text-center">删</th>
+                           </tr>
+                         </thead>
+                         <tbody>
+                           {cart.map((item) => (
+                             <motion.tr
+                               initial={{ opacity: 0, x: 20 }}
+                               animate={{ opacity: 1, x: 0 }}
+                               exit={{ opacity: 0, scale: 0.95 }}
+                               key={item.id}
+                               className="border-b border-slate-100 last:border-b-0"
+                             >
+                               <td className="px-3 py-3 align-top">
+                                 <div className="min-w-0">
+                                   <div className="truncate text-[12px] sm:text-sm font-black text-slate-900 leading-tight">{item.title}</div>
+                                   <div className="mt-1 text-[10px] font-semibold text-slate-400">{formatVT(150)} / 件</div>
+                                 </div>
+                               </td>
+                               <td className="px-2 py-3 align-middle">
+                                 <div className="flex items-center justify-center gap-1">
+                                   <button
+                                     onClick={() => updateQuantity(item.id, -1)}
+                                     className="w-5 h-5 !min-h-0 aspect-square p-0 rounded-sm bg-slate-100 hover:bg-[#f4f7ff] flex items-center justify-center text-slate-500 transition-all border border-slate-200 shrink-0"
+                                   >
+                                     <Minus size={10} />
+                                   </button>
+                                   <span className="w-5 text-center text-[12px] font-black text-slate-900">{item.quantity}</span>
+                                   <button
+                                     onClick={() => updateQuantity(item.id, 1)}
+                                     className="w-5 h-5 !min-h-0 aspect-square p-0 rounded-sm bg-white hover:bg-[#eef4ff] flex items-center justify-center text-[#1a237e] border border-slate-200 transition-all shrink-0"
+                                   >
+                                     <Plus size={10} />
+                                   </button>
+                                 </div>
+                               </td>
+                               <td className="px-2 py-3 align-middle text-right">
+                                 <div className="text-[12px] sm:text-sm font-black text-slate-900 whitespace-nowrap">{formatVT(150 * item.quantity)}</div>
+                               </td>
+                               <td className="px-2 py-3 align-middle text-center">
+                                 <button
+                                   onClick={() => removeFromCart(item.id)}
+                                   className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-[#eef4ff] hover:text-[#1a237e] transition-colors"
+                                 >
+                                   <Trash2 size={13} />
+                                 </button>
+                               </td>
+                             </motion.tr>
+                           ))}
+                         </tbody>
+                       </table>
+                     </div>
+                   )}
                </AnimatePresence>
             </div>
 
